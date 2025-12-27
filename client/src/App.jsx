@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import './index.css';
 import './App.css';
-
 function App() {
   const [screen, setScreen] = useState('welcome');
-  
-  // Estado para mensajes de alimentación (ej: "¡Ñam!")
   const [feedFeedback, setFeedFeedback] = useState({ show: false, pet: null, text: '' });
+
+  // --- ESTADO DE LIMPIEZA (Nuevo) ---
+  // false = sucio, true = limpio. Empiezan sucios para poder jugar.
+  const [petCleanliness, setPetCleanliness] = useState({
+    pet1: false, 
+    pet2: false
+  });
 
   // --- ESTADO DEL FORMULARIO ---
   const [formData, setFormData] = useState({
@@ -17,19 +21,23 @@ function App() {
     pet2Breed: ''
   });
   
-  // --- LISTA DE RAZAS ---
   const breeds = [
     { id: 'labrador', img: '/razas/labrador.png', name: 'Labrador' },
     { id: 'pug',      img: '/razas/pug.png',      name: 'Pug' }, 
     { id: 'pastor',   img: '/razas/pastor1.png',  name: 'Pastor Alemán' }
   ];
 
-  // --- LISTA DE ALIMENTOS ---
   const foodItems = [
     { id: 'Carne', icon: '🍖', name: 'Carne' },
     { id: 'Zanahoria', icon: '🥕', name: 'Zanahoria' },
     { id: 'Agua', icon: '💧', name: 'Agua' },
     { id: 'Galleta', icon: '🍪', name: 'Galleta' }
+  ];
+
+  // Herramientas de baño
+  const bathTools = [
+    { id: 'Sponge', icon: '🧽', name: 'Esponja' },
+    { id: 'Soap', icon: '🧼', name: 'Jabón' }
   ];
 
   const getBreedImage = (breedId) => {
@@ -54,27 +62,39 @@ function App() {
     setScreen('home'); 
   };
 
-  // --- LÓGICA DE ARRASTRAR Y SOLTAR ---
-  
-  const handleDragStart = (e, foodName) => {
-    e.dataTransfer.setData("foodName", foodName); 
+  // --- LÓGICA DRAG & DROP GENERICA (Sirve para Cocina y Baño) ---
+  const handleDragStart = (e, itemName, type) => {
+    e.dataTransfer.setData("itemName", itemName);
+    e.dataTransfer.setData("itemType", type); // Guardamos si es 'food' o 'tool'
   };
 
   const handleDragOver = (e) => {
-    e.preventDefault(); // ¡Esto permite que se pueda soltar el elemento!
+    e.preventDefault();
   };
 
-  const handleDrop = (e, petName) => {
+  const handleDrop = (e, petKey, petName) => {
     e.preventDefault();
-    const foodName = e.dataTransfer.getData("foodName");
+    const itemName = e.dataTransfer.getData("itemName");
+    const itemType = e.dataTransfer.getData("itemType");
     
-    // Mostrar mensaje de felicidad
-    setFeedFeedback({ show: true, pet: petName, text: `¡Ñam! 😋 (${foodName})` });
+    // CASO 1: COMIDA (Cocina)
+    if (itemType === 'food') {
+        setFeedFeedback({ show: true, pet: petName, text: `¡Ñam! 😋 (${itemName})` });
+        setTimeout(() => setFeedFeedback({ show: false, pet: null, text: '' }), 2000);
+    }
 
-    // Ocultar mensaje después de 2 segundos
-    setTimeout(() => {
-        setFeedFeedback({ show: false, pet: null, text: '' });
-    }, 2000);
+    // CASO 2: LIMPIEZA (Baño)
+    if (itemType === 'tool') {
+        // Solo limpiamos si estaba sucio
+        if (petCleanliness[petKey] === false) {
+            setPetCleanliness({ ...petCleanliness, [petKey]: true }); // ¡Ahora está limpio!
+            setFeedFeedback({ show: true, pet: petName, text: `¡Limpio! ✨` });
+            setTimeout(() => setFeedFeedback({ show: false, pet: null, text: '' }), 2000);
+        } else {
+            setFeedFeedback({ show: true, pet: petName, text: `¡Ya estoy limpio! 😄` });
+            setTimeout(() => setFeedFeedback({ show: false, pet: null, text: '' }), 2000);
+        }
+    }
   };
 
   return (
@@ -160,48 +180,25 @@ function App() {
         </section>
       )}
 
-      {/* --- PANTALLA 4: COCINA (KITCHEN) --- */}
+      {/* --- PANTALLA 4: COCINA --- */}
       {screen === 'kitchen' && (
         <section id="kitchen-screen" className="screen active">
             <button className="back-btn" onClick={() => setScreen('home')}>⬅ Volver</button>
-
             <div className="kitchen-floor">
-              {/* PERRITO 1 */}
-              <div 
-                className="pet-container"
-                onDragOver={handleDragOver} 
-                onDrop={(e) => handleDrop(e, formData.pet1Name)}
-              >
-                {feedFeedback.show && feedFeedback.pet === formData.pet1Name && (
-                    <div className="feedback-bubble">{feedFeedback.text}</div>
-                )}
+              <div className="pet-container" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, 'pet1', formData.pet1Name)}>
+                {feedFeedback.show && feedFeedback.pet === formData.pet1Name && <div className="feedback-bubble">{feedFeedback.text}</div>}
                 <img src={getBreedImage(formData.pet1Breed)} alt={formData.pet1Name} className="pet-sprite" />
                 <p className="pet-name-tag">{formData.pet1Name}</p>
               </div>
-
-              {/* PERRITO 2 */}
-              <div 
-                className="pet-container"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, formData.pet2Name)}
-              >
-                {feedFeedback.show && feedFeedback.pet === formData.pet2Name && (
-                    <div className="feedback-bubble">{feedFeedback.text}</div>
-                )}
+              <div className="pet-container" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, 'pet2', formData.pet2Name)}>
+                {feedFeedback.show && feedFeedback.pet === formData.pet2Name && <div className="feedback-bubble">{feedFeedback.text}</div>}
                 <img src={getBreedImage(formData.pet2Breed)} alt={formData.pet2Name} className="pet-sprite" />
                 <p className="pet-name-tag">{formData.pet2Name}</p>
               </div>
             </div>
-
-            {/* Barra de Comida */}
             <div className="food-bar">
                 {foodItems.map((food) => (
-                    <div 
-                        key={food.id} 
-                        className="food-item" 
-                        draggable={true} 
-                        onDragStart={(e) => handleDragStart(e, food.name)} 
-                    >
+                    <div key={food.id} className="food-item" draggable={true} onDragStart={(e) => handleDragStart(e, food.name, 'food')}>
                         {food.icon}
                     </div>
                 ))}
@@ -209,12 +206,56 @@ function App() {
         </section>
       )}
 
-      {/* --- OTRAS PANTALLAS --- */}
+      {/* --- PANTALLA 5: BAÑO (NUEVO) --- */}
       {screen === 'bathroom' && (
-        <section className="screen active" style={{background: '#d1f2ff', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-            <h1>🛁 El Baño</h1><p>Próximamente...</p><button className="btn-primary" onClick={() => setScreen('home')}>Volver</button>
+        <section id="bathroom-screen" className="screen active">
+            <button className="back-btn" onClick={() => setScreen('home')}>⬅ Volver</button>
+
+            <div className="bathroom-floor">
+              
+              {/* PERRITO 1: Clase condicional 'pet-dirty' si petCleanliness.pet1 es false */}
+              <div 
+                className={`pet-container ${!petCleanliness.pet1 ? 'pet-dirty' : ''}`} 
+                onDragOver={handleDragOver} 
+                onDrop={(e) => handleDrop(e, 'pet1', formData.pet1Name)}
+              >
+                {/* Si está sucio, mostramos moscas */}
+                {!petCleanliness.pet1 && <div className="dirt-icon">🪰</div>}
+                
+                {/* Mensaje de feedback (Limpio/Ya limpio) */}
+                {feedFeedback.show && feedFeedback.pet === formData.pet1Name && <div className="feedback-bubble">{feedFeedback.text}</div>}
+                
+                <img src={getBreedImage(formData.pet1Breed)} alt={formData.pet1Name} className="pet-sprite" />
+                <p className="pet-name-tag">{formData.pet1Name}</p>
+              </div>
+
+              {/* PERRITO 2 */}
+              <div 
+                className={`pet-container ${!petCleanliness.pet2 ? 'pet-dirty' : ''}`}
+                onDragOver={handleDragOver} 
+                onDrop={(e) => handleDrop(e, 'pet2', formData.pet2Name)}
+              >
+                {!petCleanliness.pet2 && <div className="dirt-icon">🪰</div>}
+
+                {feedFeedback.show && feedFeedback.pet === formData.pet2Name && <div className="feedback-bubble">{feedFeedback.text}</div>}
+                
+                <img src={getBreedImage(formData.pet2Breed)} alt={formData.pet2Name} className="pet-sprite" />
+                <p className="pet-name-tag">{formData.pet2Name}</p>
+              </div>
+
+            </div>
+
+            {/* Barra de Herramientas (Esponja) */}
+            <div className="tools-bar">
+                {bathTools.map((tool) => (
+                    <div key={tool.id} className="tool-item" draggable={true} onDragStart={(e) => handleDragStart(e, tool.name, 'tool')}>
+                        {tool.icon}
+                    </div>
+                ))}
+            </div>
         </section>
       )}
+
       {screen === 'garden' && (
         <section className="screen active" style={{background: '#d1ffdb', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
             <h1>🌳 El Patio</h1><p>Próximamente...</p><button className="btn-primary" onClick={() => setScreen('home')}>Volver</button>
