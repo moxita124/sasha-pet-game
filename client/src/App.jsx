@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import './index.css';
 import './App.css';
+
 function App() {
   const [screen, setScreen] = useState('welcome');
   const [feedFeedback, setFeedFeedback] = useState({ show: false, pet: null, text: '' });
-
-  // --- ESTADO DE LIMPIEZA (Nuevo) ---
-  // false = sucio, true = limpio. Empiezan sucios para poder jugar.
-  const [petCleanliness, setPetCleanliness] = useState({
-    pet1: false, 
-    pet2: false
-  });
+  
+  // Estados de los minijuegos
+  const [petCleanliness, setPetCleanliness] = useState({ pet1: false, pet2: false });
+  const [score, setScore] = useState(0); // Puntos del juego
+  const [isBallThrown, setIsBallThrown] = useState(false); // ¿La pelota está volando?
 
   // --- ESTADO DEL FORMULARIO ---
   const [formData, setFormData] = useState({
@@ -34,7 +33,6 @@ function App() {
     { id: 'Galleta', icon: '🍪', name: 'Galleta' }
   ];
 
-  // Herramientas de baño
   const bathTools = [
     { id: 'Sponge', icon: '🧽', name: 'Esponja' },
     { id: 'Soap', icon: '🧼', name: 'Jabón' }
@@ -62,10 +60,27 @@ function App() {
     setScreen('home'); 
   };
 
-  // --- LÓGICA DRAG & DROP GENERICA (Sirve para Cocina y Baño) ---
+  // --- LÓGICA DE JUEGO (PATIO) ---
+  const throwBall = () => {
+    if (isBallThrown) return; // Si ya la lanzaste, espera
+
+    setIsBallThrown(true); // Activa animación de pelota
+
+    // Después de 1 segundo (cuando la pelota cae)
+    setTimeout(() => {
+        setScore(score + 10); // Ganas 10 puntos
+        setFeedFeedback({ show: true, pet: 'both', text: '¡Buen tiro! +10' });
+        setIsBallThrown(false); // La pelota regresa
+        
+        // Ocultar mensaje
+        setTimeout(() => setFeedFeedback({ show: false, pet: null, text: '' }), 1500);
+    }, 1000);
+  };
+
+  // --- LÓGICA DRAG & DROP ---
   const handleDragStart = (e, itemName, type) => {
     e.dataTransfer.setData("itemName", itemName);
-    e.dataTransfer.setData("itemType", type); // Guardamos si es 'food' o 'tool'
+    e.dataTransfer.setData("itemType", type); 
   };
 
   const handleDragOver = (e) => {
@@ -77,17 +92,14 @@ function App() {
     const itemName = e.dataTransfer.getData("itemName");
     const itemType = e.dataTransfer.getData("itemType");
     
-    // CASO 1: COMIDA (Cocina)
     if (itemType === 'food') {
         setFeedFeedback({ show: true, pet: petName, text: `¡Ñam! 😋 (${itemName})` });
         setTimeout(() => setFeedFeedback({ show: false, pet: null, text: '' }), 2000);
     }
 
-    // CASO 2: LIMPIEZA (Baño)
     if (itemType === 'tool') {
-        // Solo limpiamos si estaba sucio
         if (petCleanliness[petKey] === false) {
-            setPetCleanliness({ ...petCleanliness, [petKey]: true }); // ¡Ahora está limpio!
+            setPetCleanliness({ ...petCleanliness, [petKey]: true }); 
             setFeedFeedback({ show: true, pet: petName, text: `¡Limpio! ✨` });
             setTimeout(() => setFeedFeedback({ show: false, pet: null, text: '' }), 2000);
         } else {
@@ -150,7 +162,7 @@ function App() {
          </section>
       )}
 
-      {/* --- PANTALLA 3: LA CASA (HUB) --- */}
+      {/* --- PANTALLA 3: LA CASA --- */}
       {screen === 'home' && (
         <section id="house-screen" className="screen active">
             <div className="house-header">
@@ -206,46 +218,24 @@ function App() {
         </section>
       )}
 
-      {/* --- PANTALLA 5: BAÑO (NUEVO) --- */}
+      {/* --- PANTALLA 5: BAÑO --- */}
       {screen === 'bathroom' && (
         <section id="bathroom-screen" className="screen active">
             <button className="back-btn" onClick={() => setScreen('home')}>⬅ Volver</button>
-
             <div className="bathroom-floor">
-              
-              {/* PERRITO 1: Clase condicional 'pet-dirty' si petCleanliness.pet1 es false */}
-              <div 
-                className={`pet-container ${!petCleanliness.pet1 ? 'pet-dirty' : ''}`} 
-                onDragOver={handleDragOver} 
-                onDrop={(e) => handleDrop(e, 'pet1', formData.pet1Name)}
-              >
-                {/* Si está sucio, mostramos moscas */}
+              <div className={`pet-container ${!petCleanliness.pet1 ? 'pet-dirty' : ''}`} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, 'pet1', formData.pet1Name)}>
                 {!petCleanliness.pet1 && <div className="dirt-icon">🪰</div>}
-                
-                {/* Mensaje de feedback (Limpio/Ya limpio) */}
                 {feedFeedback.show && feedFeedback.pet === formData.pet1Name && <div className="feedback-bubble">{feedFeedback.text}</div>}
-                
                 <img src={getBreedImage(formData.pet1Breed)} alt={formData.pet1Name} className="pet-sprite" />
                 <p className="pet-name-tag">{formData.pet1Name}</p>
               </div>
-
-              {/* PERRITO 2 */}
-              <div 
-                className={`pet-container ${!petCleanliness.pet2 ? 'pet-dirty' : ''}`}
-                onDragOver={handleDragOver} 
-                onDrop={(e) => handleDrop(e, 'pet2', formData.pet2Name)}
-              >
+              <div className={`pet-container ${!petCleanliness.pet2 ? 'pet-dirty' : ''}`} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, 'pet2', formData.pet2Name)}>
                 {!petCleanliness.pet2 && <div className="dirt-icon">🪰</div>}
-
                 {feedFeedback.show && feedFeedback.pet === formData.pet2Name && <div className="feedback-bubble">{feedFeedback.text}</div>}
-                
                 <img src={getBreedImage(formData.pet2Breed)} alt={formData.pet2Name} className="pet-sprite" />
                 <p className="pet-name-tag">{formData.pet2Name}</p>
               </div>
-
             </div>
-
-            {/* Barra de Herramientas (Esponja) */}
             <div className="tools-bar">
                 {bathTools.map((tool) => (
                     <div key={tool.id} className="tool-item" draggable={true} onDragStart={(e) => handleDragStart(e, tool.name, 'tool')}>
@@ -256,9 +246,40 @@ function App() {
         </section>
       )}
 
+      {/* --- PANTALLA 6: PATIO (GAME) --- */}
       {screen === 'garden' && (
-        <section className="screen active" style={{background: '#d1ffdb', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-            <h1>🌳 El Patio</h1><p>Próximamente...</p><button className="btn-primary" onClick={() => setScreen('home')}>Volver</button>
+        <section id="garden-screen" className="screen active">
+            <button className="back-btn" onClick={() => setScreen('home')}>⬅ Volver</button>
+            
+            {/* Marcador */}
+            <div className="score-board">Puntos: {score}</div>
+            
+            {/* Mensaje de feedback central */}
+            {feedFeedback.show && feedFeedback.pet === 'both' && (
+                 <div className="feedback-bubble" style={{top: '30%', left: '50%', transform: 'translateX(-50%)', fontSize: '1.5rem'}}>
+                    {feedFeedback.text}
+                 </div>
+            )}
+
+            <div className="garden-floor">
+              {/* Clase condicional: Si se lanza la pelota, los perros saltan (pet-jump) */}
+              <div className={`pet-container ${isBallThrown ? 'pet-jump' : ''}`}>
+                <img src={getBreedImage(formData.pet1Breed)} alt={formData.pet1Name} className="pet-sprite" />
+                <p className="pet-name-tag">{formData.pet1Name}</p>
+              </div>
+              <div className={`pet-container ${isBallThrown ? 'pet-jump' : ''}`}>
+                <img src={getBreedImage(formData.pet2Breed)} alt={formData.pet2Name} className="pet-sprite" />
+                <p className="pet-name-tag">{formData.pet2Name}</p>
+              </div>
+            </div>
+
+            {/* La Pelota Interactiva */}
+            <div 
+                className={`ball ${isBallThrown ? 'thrown' : ''}`} 
+                onClick={throwBall}
+            >
+                🎾
+            </div>
         </section>
       )}
 

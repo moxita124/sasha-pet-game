@@ -182,6 +182,58 @@ input[type="text"]:focus {
     margin-top: 10px;
 }
 
+/* --- ELEMENTOS COMUNES DE PANTALLAS --- */
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-size: 1rem;
+    z-index: 20;
+    transition: transform 0.2s;
+}
+
+.back-btn:hover {
+    transform: scale(1.1);
+    background: white;
+}
+
+/* Contenedor de mascota genérico */
+.pet-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: breathe 3s infinite ease-in-out;
+    position: relative; 
+    pointer-events: auto; /* Permite interacción */
+}
+
+.pet-sprite {
+    width: 130px; 
+    height: auto;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));
+}
+
+.pet-name-tag {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+@keyframes breathe {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
 /* --- PANTALLA DE LA CASA (SALA) --- */
 #house-screen {
     background-image: url('/sala-bg.jpg'); 
@@ -222,34 +274,6 @@ input[type="text"]:focus {
     gap: 80px;
     z-index: 5;
     pointer-events: none; 
-}
-
-.pet-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    animation: breathe 3s infinite ease-in-out;
-    position: relative; /* Para que la burbuja se posicione respecto al perro */
-}
-
-.pet-sprite {
-    width: 130px; 
-    height: auto;
-    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));
-}
-
-.pet-name-tag {
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 0.85rem;
-    margin-top: 5px;
-}
-
-@keyframes breathe {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
 }
 
 .nav-bar {
@@ -308,27 +332,6 @@ input[type="text"]:focus {
     position: relative;
 }
 
-.back-btn {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    font-size: 1rem;
-    z-index: 20;
-    transition: transform 0.2s;
-}
-
-.back-btn:hover {
-    transform: scale(1.1);
-    background: white;
-}
-
 .kitchen-floor {
     position: absolute;
     bottom: 140px; 
@@ -337,7 +340,6 @@ input[type="text"]:focus {
     justify-content: center;
     gap: 100px;
     z-index: 5;
-    /* IMPORTANTE: Quitamos pointer-events: none para que funcione el Drag&Drop */
 }
 
 .food-bar {
@@ -371,44 +373,9 @@ input[type="text"]:focus {
     transform: scale(0.9);
 }
 
-/* --- BURBUJA DE MENSAJE --- */
-.feedback-bubble {
-    position: absolute;
-    top: -50px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    color: #ff9f43;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    border: 2px solid #ff9f43;
-    animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    white-space: nowrap;
-    z-index: 50;
-    pointer-events: none;
-}
-
-/* Triangulito de la burbuja */
-.feedback-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 8px 8px 0;
-    border-style: solid;
-    border-color: #ff9f43 transparent transparent transparent;
-}
-
-@keyframes popUp {
-    0% { transform: translateX(-50%) scale(0); opacity: 0; }
-    100% { transform: translateX(-50%) scale(1); opacity: 1; }
-}
 /* --- PANTALLA DEL BAÑO --- */
 #bathroom-screen {
-    background-image: url('/bano-bg.jpg'); /* Asegúrate de tener la imagen */
+    background-image: url('/bano-bg.jpg');
     background-size: cover;
     background-position: center;
     flex-direction: column;
@@ -416,7 +383,6 @@ input[type="text"]:focus {
     position: relative;
 }
 
-/* Piso del baño (Donde están la bañera o los perros) */
 .bathroom-floor {
     position: absolute;
     bottom: 140px; 
@@ -427,13 +393,12 @@ input[type="text"]:focus {
     z-index: 5;
 }
 
-/* EFECTO DE SUCIEDAD (Clase clave) */
+/* Efecto de suciedad */
 .pet-dirty .pet-sprite {
-    filter: sepia(0.8) brightness(0.7) drop-shadow(0 0 15px #5e4b35); /* Tono marrón barro */
-    transition: filter 1s ease; /* Transición suave al limpiarse */
+    filter: sepia(0.8) brightness(0.7) drop-shadow(0 0 15px #5e4b35);
+    transition: filter 1s ease;
 }
 
-/* Icono de suciedad flotante (Moscas/Manchas) */
 .dirt-icon {
     position: absolute;
     top: 20%;
@@ -447,24 +412,6 @@ input[type="text"]:focus {
     to { transform: translate(2px, -2px) rotate(10deg); }
 }
 
-/* Efecto visual al limpiarse (Brillo) */
-.clean-sparkle {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    animation: sparkleAnim 1s ease-out;
-}
-
-@keyframes sparkleAnim {
-    0% { opacity: 0; transform: scale(0.5); }
-    50% { opacity: 1; transform: scale(1.2); }
-    100% { opacity: 0; transform: scale(1.5); }
-}
-
-/* Barra de Herramientas de Limpieza */
 .tools-bar {
     width: 100%;
     height: 120px;
@@ -494,4 +441,116 @@ input[type="text"]:focus {
 .tool-item:active {
     cursor: grabbing;
     transform: scale(0.9);
+}
+
+/* --- PANTALLA DEL PATIO (JARDÍN) --- */
+#garden-screen {
+    background-image: url('/patio-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+    overflow: hidden; 
+}
+
+/* Marcador de Puntos */
+.score-board {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1dd1a1;
+    border: 3px solid #1dd1a1;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.garden-floor {
+    position: absolute;
+    bottom: 100px; 
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 150px;
+    z-index: 5;
+}
+
+/* La Pelota */
+.ball {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 4rem;
+    cursor: pointer;
+    z-index: 20;
+    transition: transform 0.1s;
+}
+
+.ball:hover {
+    transform: translateX(-50%) scale(1.1);
+}
+
+.ball:active {
+    transform: translateX(-50%) scale(0.9);
+}
+
+/* Animación de lanzar la pelota */
+.ball.thrown {
+    animation: throwBall 1s forwards ease-out;
+}
+
+@keyframes throwBall {
+    0% { bottom: 50px; transform: translateX(-50%) scale(1); }
+    50% { bottom: 60%; transform: translateX(-50%) scale(0.5); }
+    100% { bottom: 40%; transform: translateX(-50%) scale(0.2); opacity: 0; }
+}
+
+/* Animación de los perros saltando */
+.pet-jump {
+    animation: jumpExcited 0.5s alternate 2; 
+}
+
+@keyframes jumpExcited {
+    from { transform: translateY(0); }
+    to { transform: translateY(-50px) rotate(5deg); }
+}
+
+/* --- BURBUJA DE MENSAJE (FEEDBACK) --- */
+.feedback-bubble {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: #ff9f43;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border: 2px solid #ff9f43;
+    animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    white-space: nowrap;
+    z-index: 50;
+    pointer-events: none;
+}
+
+.feedback-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: #ff9f43 transparent transparent transparent;
+}
+
+@keyframes popUp {
+    0% { transform: translateX(-50%) scale(0); opacity: 0; }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
 }
