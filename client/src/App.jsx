@@ -8,8 +8,11 @@ function App() {
   
   // Estados de los minijuegos
   const [petCleanliness, setPetCleanliness] = useState({ pet1: false, pet2: false });
-  const [score, setScore] = useState(0); // Puntos del juego
-  const [isBallThrown, setIsBallThrown] = useState(false); // ¿La pelota está volando?
+  const [score, setScore] = useState(0); 
+  const [isBallThrown, setIsBallThrown] = useState(false);
+  
+  // ESTADO DEL DORMITORIO (Nuevo)
+  const [lightsOn, setLightsOn] = useState(true); // true = día, false = noche
 
   // --- ESTADO DEL FORMULARIO ---
   const [formData, setFormData] = useState({
@@ -60,24 +63,23 @@ function App() {
     setScreen('home'); 
   };
 
-  // --- LÓGICA DE JUEGO (PATIO) ---
+  // --- FUNCIONES DEL JUEGO ---
   const throwBall = () => {
-    if (isBallThrown) return; // Si ya la lanzaste, espera
-
-    setIsBallThrown(true); // Activa animación de pelota
-
-    // Después de 1 segundo (cuando la pelota cae)
+    if (isBallThrown) return; 
+    setIsBallThrown(true); 
     setTimeout(() => {
-        setScore(score + 10); // Ganas 10 puntos
+        setScore(score + 10); 
         setFeedFeedback({ show: true, pet: 'both', text: '¡Buen tiro! +10' });
-        setIsBallThrown(false); // La pelota regresa
-        
-        // Ocultar mensaje
+        setIsBallThrown(false); 
         setTimeout(() => setFeedFeedback({ show: false, pet: null, text: '' }), 1500);
     }, 1000);
   };
 
-  // --- LÓGICA DRAG & DROP ---
+  const toggleLights = () => {
+    setLightsOn(!lightsOn); // Apaga o prende la luz
+  };
+
+  // --- DRAG & DROP ---
   const handleDragStart = (e, itemName, type) => {
     e.dataTransfer.setData("itemName", itemName);
     e.dataTransfer.setData("itemType", type); 
@@ -162,7 +164,7 @@ function App() {
          </section>
       )}
 
-      {/* --- PANTALLA 3: LA CASA --- */}
+      {/* --- PANTALLA 3: LA CASA (HUB) --- */}
       {screen === 'home' && (
         <section id="house-screen" className="screen active">
             <div className="house-header">
@@ -187,6 +189,10 @@ function App() {
                 </button>
                 <button className="nav-btn garden" onClick={() => setScreen('garden')}>
                     🎾 <span className="btn-label">Jugar</span>
+                </button>
+                {/* Botón Nuevo: DORMIR */}
+                <button className="nav-btn sleep" onClick={() => setScreen('bedroom')}>
+                    🌙 <span className="btn-label">Dormir</span>
                 </button>
             </div>
         </section>
@@ -246,23 +252,15 @@ function App() {
         </section>
       )}
 
-      {/* --- PANTALLA 6: PATIO (GAME) --- */}
+      {/* --- PANTALLA 6: PATIO --- */}
       {screen === 'garden' && (
         <section id="garden-screen" className="screen active">
             <button className="back-btn" onClick={() => setScreen('home')}>⬅ Volver</button>
-            
-            {/* Marcador */}
             <div className="score-board">Puntos: {score}</div>
-            
-            {/* Mensaje de feedback central */}
             {feedFeedback.show && feedFeedback.pet === 'both' && (
-                 <div className="feedback-bubble" style={{top: '30%', left: '50%', transform: 'translateX(-50%)', fontSize: '1.5rem'}}>
-                    {feedFeedback.text}
-                 </div>
+                 <div className="feedback-bubble" style={{top: '30%', left: '50%', transform: 'translateX(-50%)', fontSize: '1.5rem'}}>{feedFeedback.text}</div>
             )}
-
             <div className="garden-floor">
-              {/* Clase condicional: Si se lanza la pelota, los perros saltan (pet-jump) */}
               <div className={`pet-container ${isBallThrown ? 'pet-jump' : ''}`}>
                 <img src={getBreedImage(formData.pet1Breed)} alt={formData.pet1Name} className="pet-sprite" />
                 <p className="pet-name-tag">{formData.pet1Name}</p>
@@ -272,13 +270,35 @@ function App() {
                 <p className="pet-name-tag">{formData.pet2Name}</p>
               </div>
             </div>
+            <div className={`ball ${isBallThrown ? 'thrown' : ''}`} onClick={throwBall}>🎾</div>
+        </section>
+      )}
 
-            {/* La Pelota Interactiva */}
-            <div 
-                className={`ball ${isBallThrown ? 'thrown' : ''}`} 
-                onClick={throwBall}
-            >
-                🎾
+      {/* --- PANTALLA 7: DORMITORIO (NUEVO) --- */}
+      {screen === 'bedroom' && (
+        <section id="bedroom-screen" className="screen active">
+            <button className="back-btn" onClick={() => setScreen('home')}>⬅ Volver</button>
+            
+            {/* Capa de oscuridad (Solo visible si lightsOn es false) */}
+            {!lightsOn && <div className="night-overlay"></div>}
+
+            {/* Interruptor de Luz */}
+            <div className="light-switch" onClick={toggleLights}>
+                {lightsOn ? '☀️' : '🌙'}
+            </div>
+
+            <div className="bedroom-floor">
+              <div className="pet-container">
+                {/* Si la luz está apagada, muestra los Zzz */}
+                {!lightsOn && <div className="zzz-bubble">Zzz...</div>}
+                <img src={getBreedImage(formData.pet1Breed)} alt={formData.pet1Name} className="pet-sprite" />
+                <p className="pet-name-tag">{formData.pet1Name}</p>
+              </div>
+              <div className="pet-container">
+                {!lightsOn && <div className="zzz-bubble">Zzz...</div>}
+                <img src={getBreedImage(formData.pet2Breed)} alt={formData.pet2Name} className="pet-sprite" />
+                <p className="pet-name-tag">{formData.pet2Name}</p>
+              </div>
             </div>
         </section>
       )}

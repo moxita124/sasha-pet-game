@@ -554,3 +554,89 @@ input[type="text"]:focus {
     0% { transform: translateX(-50%) scale(0); opacity: 0; }
     100% { transform: translateX(-50%) scale(1); opacity: 1; }
 }
+/* --- PANTALLA DORMITORIO --- */
+#bedroom-screen {
+    background-image: url('/dormitorio-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+    transition: filter 0.5s; /* Suaviza el cambio de luz */
+}
+
+/* Piso del dormitorio */
+.bedroom-floor {
+    position: absolute;
+    bottom: 120px; /* Un poco más abajo si están en camitas */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 120px;
+    z-index: 5;
+}
+
+/* INTERRUPTOR DE LUZ */
+.light-switch {
+    position: absolute;
+    top: 100px; /* Debajo del botón volver */
+    left: 20px;
+    background: #f1c40f;
+    border: 3px solid #f39c12;
+    padding: 10px 15px;
+    border-radius: 50%;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 20;
+    transition: all 0.2s;
+}
+
+.light-switch:active {
+    transform: scale(0.9);
+}
+
+/* MODO NOCHE (Oscuridad) */
+.night-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 10, 0.6); /* Azul oscuro semitransparente */
+    pointer-events: none; /* Deja pasar los clicks */
+    z-index: 10; /* Encima del fondo, debajo de la interfaz */
+    animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Animación Zzz (Sueño) */
+.zzz-bubble {
+    position: absolute;
+    top: -60px;
+    right: -20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 5px black;
+    animation: floatZzz 2s infinite ease-in-out;
+    opacity: 0;
+}
+
+/* Hacemos que la burbuja suba y desaparezca */
+@keyframes floatZzz {
+    0% { transform: translateY(0) scale(0.5); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
+}
+
+/* Modificación para el botón extra en el menú principal */
+.nav-bar {
+    gap: 20px; /* Reducimos un poco el espacio para que quepan 4 botones */
+}
+
+.nav-btn.sleep { background-color: #9b59b6; color: white; } /* Morado */
