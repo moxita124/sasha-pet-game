@@ -5,7 +5,7 @@ import './App.css';
 function App() {
   const [screen, setScreen] = useState('welcome');
 
-  // --- ESTADO DEL FORMULARIO (Aquí guardamos los datos) ---
+  // --- ESTADO DEL FORMULARIO ---
   const [formData, setFormData] = useState({
     ownerName: '',
     pet1Name: '',
@@ -14,31 +14,33 @@ function App() {
     pet2Breed: ''
   });
   
-  // Lista de razas
+  // --- LISTA DE RAZAS ---
   const breeds = [
     { id: 'labrador', img: '/razas/labrador.png', name: 'Labrador' },
-    { id: 'pug', img: '/razas/pug.png', name: 'Pug' },
-    { id: 'pastor', img: '/razas/pastor1.png', name: 'Pastor' }
+    { id: 'pug',      img: '/razas/pug.png',      name: 'Pug' }, 
+    { id: 'pastor',   img: '/razas/pastor1.png',  name: 'Pastor Alemán' }
   ];
 
-  // Función para manejar cambios en los textos
+  // Helper para buscar la imagen
+  const getBreedImage = (breedId) => {
+    const breed = breeds.find(b => b.id === breedId);
+    return breed ? breed.img : null;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Función para seleccionar raza
   const selectBreed = (petNumber, breedId) => {
     setFormData({ ...formData, [`pet${petNumber}Breed`]: breedId });
   };
 
-  // Función para guardar y entrar
   const handleStart = () => {
     if (!formData.ownerName || !formData.pet1Name || !formData.pet2Name || !formData.pet1Breed || !formData.pet2Breed) {
-      alert("¡Por favor completa todos los campos para tus perritos!");
+      alert("¡Por favor completa todos los campos!");
       return;
     }
-    console.log("Datos guardados:", formData); 
     setScreen('home'); 
   };
 
@@ -61,64 +63,35 @@ function App() {
 
       {/* --- PANTALLA 2: REGISTRO --- */}
       {screen === 'register' && (
-         <section id="register-screen" className="screen active scrollable">
+         <section id="register-screen" className="screen active">
             <div className="register-card">
               <h2>¡Vamos a conocernos!</h2>
               
-              {/* Sección Dueño */}
               <div className="form-group">
                 <label>Tu Nombre:</label>
-                <input 
-                  type="text" 
-                  name="ownerName" 
-                  placeholder="¿Cómo te llamas?" 
-                  value={formData.ownerName}
-                  onChange={handleInputChange}
-                />
+                <input type="text" name="ownerName" placeholder="¿Cómo te llamas?" value={formData.ownerName} onChange={handleInputChange} />
               </div>
 
-              {/* Sección Mascota 1 */}
+              {/* PERRITO 1 */}
               <div className="pet-section">
                 <h3>🐶 Perrito 1</h3>
-                <input 
-                  type="text" 
-                  name="pet1Name" 
-                  placeholder="Nombre de tu primer perrito"
-                  value={formData.pet1Name}
-                  onChange={handleInputChange}
-                />
-                <p>Elige su raza:</p>
+                <input type="text" name="pet1Name" placeholder="Nombre..." value={formData.pet1Name} onChange={handleInputChange} />
                 <div className="breed-options">
                   {breeds.map((breed) => (
-                    <div 
-                      key={breed.id} 
-                      className={`breed-icon ${formData.pet1Breed === breed.id ? 'selected' : ''}`}
-                      onClick={() => selectBreed(1, breed.id)}
-                    >
+                    <div key={breed.id} className={`breed-icon ${formData.pet1Breed === breed.id ? 'selected' : ''}`} onClick={() => selectBreed(1, breed.id)}>
                       <img src={breed.img} alt={breed.name} />
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Sección Mascota 2 */}
+              {/* PERRITO 2 */}
               <div className="pet-section">
                 <h3>🐶 Perrito 2</h3>
-                <input 
-                  type="text" 
-                  name="pet2Name" 
-                  placeholder="Nombre de tu segundo perrito"
-                  value={formData.pet2Name}
-                  onChange={handleInputChange}
-                />
-                <p>Elige su raza:</p>
+                <input type="text" name="pet2Name" placeholder="Nombre..." value={formData.pet2Name} onChange={handleInputChange} />
                 <div className="breed-options">
                   {breeds.map((breed) => (
-                    <div 
-                      key={breed.id} 
-                      className={`breed-icon ${formData.pet2Breed === breed.id ? 'selected' : ''}`}
-                      onClick={() => selectBreed(2, breed.id)}
-                    >
+                    <div key={breed.id} className={`breed-icon ${formData.pet2Breed === breed.id ? 'selected' : ''}`} onClick={() => selectBreed(2, breed.id)}>
                        <img src={breed.img} alt={breed.name} />
                     </div>
                   ))}
@@ -132,13 +105,44 @@ function App() {
          </section>
       )}
 
-      {/* --- PANTALLA 3: HOME (Placeholder) --- */}
+      {/* --- PANTALLA 3: LA CASA --- */}
       {screen === 'home' && (
-        <div style={{color: 'white', textAlign: 'center', paddingTop: '50px'}}>
-            <h1>¡Hola {formData.ownerName}!</h1>
-            <p>Aquí estarán {formData.pet1Name} y {formData.pet2Name}.</p>
-            <p>(Próximamente: La Sala de Estar)</p>
-        </div>
+        <section id="house-screen" className="screen active">
+            
+            {/* Saludo superior */}
+            <div className="house-header">
+              <h2>Hola, {formData.ownerName}</h2>
+            </div>
+
+            {/* Perros en el sofá */}
+            <div className="living-room-floor">
+              <div className="pet-container">
+                <img src={getBreedImage(formData.pet1Breed)} alt={formData.pet1Name} className="pet-sprite" />
+                <p className="pet-name-tag">{formData.pet1Name}</p>
+              </div>
+
+              <div className="pet-container">
+                <img src={getBreedImage(formData.pet2Breed)} alt={formData.pet2Name} className="pet-sprite" />
+                <p className="pet-name-tag">{formData.pet2Name}</p>
+              </div>
+            </div>
+            
+            {/* Barra de Acciones */}
+            <div className="nav-bar">
+                <button className="nav-btn kitchen" onClick={() => alert("¡Vamos a la cocina!")}>
+                    🍖 <span className="btn-label">Comer</span>
+                </button>
+                
+                <button className="nav-btn bathroom" onClick={() => alert("¡Vamos al baño!")}>
+                    🛁 <span className="btn-label">Bañar</span>
+                </button>
+                
+                <button className="nav-btn garden" onClick={() => alert("¡Vamos al patio!")}>
+                    🎾 <span className="btn-label">Jugar</span>
+                </button>
+            </div>
+
+        </section>
       )}
 
     </div>
